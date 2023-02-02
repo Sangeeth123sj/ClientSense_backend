@@ -52,9 +52,9 @@ async def autocorrect(text: str= Form(...)):
 
 # endpoint to summarize the sales conversation for further follow up
 @app.post("/summarize/")
-async def autocorrect(text: str= Form(...)):
+async def summarize(text: str= Form(...)):
     response = co.generate( 
-    model='large', 
+    model='xlarge', 
     prompt = text,
     max_tokens=60, 
     temperature=0.8,
