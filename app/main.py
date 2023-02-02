@@ -37,32 +37,32 @@ async def root():
 # using transcription in vuejs on the frontend
 @app.post("/autocorrect/")
 async def autocorrect(text: str= Form(...)):
-    # initial try with Open AI api but Cohere works well enough congrats ;)
-    # response = openai.Completion.create(
-    #     model="text-davinci-003",
-    #     prompt=f"Correct this to standard English:\n\n.{text}",
-    #     temperature=0.0,
-    #     max_tokens=2000,
-    #     top_p=1,
-    #     frequency_penalty=0,
-    #     presence_penalty=0
-    # )
+    # initial try with Open AI api since Cohere makes some mistakes sometimes by adding extra text
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=f"Correct this to standard English:\n\n.{text}",
+        temperature=0.0,
+        max_tokens=2000,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
 
     # using cohere generate to autocorrect transcribed text
-    co_response = co.generate(
-    model='command-xlarge-nightly',
-    prompt=f'Make this grammaticaly correct and add punctuations:\n {text}',
-    max_tokens=300,
-    temperature=0.9,
-    k=0,
-    p=0.75,
-    frequency_penalty=0,
-    presence_penalty=0,
-    stop_sequences=[],
-    return_likelihoods='NONE')
-    print('Prediction: {}'.format(co_response.generations[0].text))
-    print("response:",co_response.generations[0].text)
-    return {"response":co_response.generations[0].text}
+    # co_response = co.generate(
+    # model='command-xlarge-nightly',
+    # prompt=f'Make this grammaticaly correct and add punctuations:\n {text}',
+    # max_tokens=900,
+    # temperature=0.0,
+    # k=0,
+    # p=0.75,
+    # frequency_penalty=0,
+    # presence_penalty=0,
+    # stop_sequences=[],
+    # return_likelihoods='NONE')
+    # print('Prediction: {}'.format(co_response.generations[0].text))
+    print("response:",response)
+    return {"response": response}
 
 
 # endpoint to summarize the sales conversation for further follow up
