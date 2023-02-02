@@ -37,31 +37,32 @@ async def root():
 # using transcription in vuejs on the frontend
 @app.post("/autocorrect/")
 async def autocorrect(text: str= Form(...)):
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=f"Correct this to standard English:\n\n.{text}",
-        temperature=0.0,
-        max_tokens=2000,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
-    )
-    # Cohere text transcription corrector has limitations so replaced with Open AI model
-    # co_response = co.generate(
-    #     model='xlarge',
-    #     prompt=f'This is voice-to-text transcription corrector. Given a transcribed excerpt with errors, the model responds with the correct version of the excerpt.\n\nIncorrect transcription: I am balling into hay to read port missing credit card. I lost by card when I what\'s at the grocery store and I need to see sent a new one.\n\nCorrect transcription: I am calling in today to report a missing credit card. I lost my card when I was at the grocery store and I need to be sent a new one.\n--\nIncorrect transcription: {text}.\n\nCorrect transcription:',
-    #     max_tokens=500,
-    #     temperature=0.5,
-    #     k=0,
-    #     p=1,
+    # initial try with Open AI api but Cohere works well enough congrats ;)
+    # response = openai.Completion.create(
+    #     model="text-davinci-003",
+    #     prompt=f"Correct this to standard English:\n\n.{text}",
+    #     temperature=0.0,
+    #     max_tokens=2000,
+    #     top_p=1,
     #     frequency_penalty=0,
-    #     presence_penalty=0,
-    #     stop_sequences=["--"],
-    #     return_likelihoods='NONE'
+    #     presence_penalty=0
     # )
-    # print('Prediction: {}'.format(response.generations[0].text))
-    print("response:",response)
-    return {"response":response}
+
+    # using cohere generate to autocorrect transcribed text
+    co_response = co.generate(
+    model='command-xlarge-nightly',
+    prompt=f'Make this grammaticaly correct and add punctuations:\n {text}',
+    max_tokens=300,
+    temperature=0.9,
+    k=0,
+    p=0.75,
+    frequency_penalty=0,
+    presence_penalty=0,
+    stop_sequences=[],
+    return_likelihoods='NONE')
+    print('Prediction: {}'.format(co_response.generations[0].text))
+    print("response:",co_response.generations[0].text)
+    return {"response":co_response.generations[0].text}
 
 
 # endpoint to summarize the sales conversation for further follow up
