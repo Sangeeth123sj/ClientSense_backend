@@ -68,12 +68,43 @@ async def autocorrect(text: str= Form(...)):
 # endpoint to summarize the sales conversation for further follow up
 @app.post("/summarize/")
 async def summarize(text: str= Form(...)):
-    response = co.generate( 
-    model='xlarge', 
-    prompt = text,
-    max_tokens=60, 
+    response = co.generate(
+    model='xlarge',
+    prompt='''Conversation: Hello, can I help you with anything today?
+            Yes, I'm looking for a new phone. Do you have the latest model in stock?
+            Yes, we have it available. Can I see it? Of course, here it is. What do you think of it?
+            It's perfect, I'll take it.How much does it cost? It's priced at $800.
+            Alright, I'll purchase it. Thank you for your assistance. You're welcome, have a great day.
+            \n
+            Summary: A customer is looking for a new phone and asks if the latest model is in stock. 
+            The salesman provides the phone for the customer to see and the customer decides to purchase it for $800. 
+            The salesman thanks the customer for the purchase.
+            \n--\n
+            Conversation: Hello, how can I assist you today?
+            I'm in need of a new laptop. Do you have any recommendations?
+            Yes, we have several options that might interest you.
+            Can you show me some of them? Of course, here are a few.
+            Which one do you like the best? I think this one would be great.
+            How much is it? It's priced at $1,200. Okay, I'll take it.
+            Thank you for your help. You're welcome, have a great day.
+            \n
+            Summary: A customer is in need of a new laptop and asks for recommendations.
+            The salesman provides several options for the customer to choose from.
+            The customer decides on one laptop and purchases it for $1,200.
+            The salesman thanks the customer for the purchase.
+            \n--\n
+            Conversation:{text}
+            \n
+            Summary:
+            ''',
+    max_tokens=100,
     temperature=0.8,
-    stop_sequences=["--"])
+    k=0,
+    p=1,
+    frequency_penalty=0,
+    presence_penalty=0,
+    stop_sequences=["--"],
+    return_likelihoods='NONE')
 
     summary = response.generations[0].text
     print("summary:",summary)
